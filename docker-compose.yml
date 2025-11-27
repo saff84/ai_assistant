@@ -106,6 +106,9 @@ services:
       NODE_ENV: production
       PORT: 3000
       
+      # Auth
+      DISABLE_AUTH: "true"
+
       # Login credentials (username/password)
       DEV_MODE: ${DEV_MODE:-true}
       DEV_ADMIN_EMAIL: ${DEV_ADMIN_EMAIL:-admin@admin.local}

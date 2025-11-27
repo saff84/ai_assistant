@@ -1,6 +1,20 @@
 import type { CreateExpressContextOptions } from "@trpc/server/adapters/express";
 import type { User } from "../../drizzle/schema";
+import { ENV } from "./env";
 import { sdk } from "./sdk";
+
+const DISABLED_USER: User = {
+  id: -1,
+  openId: "auth-disabled",
+  name: "Admin",
+  email: "admin@localhost",
+  passwordHash: null,
+  loginMethod: "disabled",
+  role: "admin",
+  createdAt: new Date(),
+  updatedAt: new Date(),
+  lastSignedIn: new Date(),
+};
 
 export type TrpcContext = {
   req: CreateExpressContextOptions["req"];
@@ -11,6 +25,14 @@ export type TrpcContext = {
 export async function createContext(
   opts: CreateExpressContextOptions
 ): Promise<TrpcContext> {
+  if (ENV.authDisabled) {
+    return {
+      req: opts.req,
+      res: opts.res,
+      user: DISABLED_USER,
+    };
+  }
+
   let user: User | null = null;
 
   try {

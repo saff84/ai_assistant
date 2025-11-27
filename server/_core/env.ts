@@ -12,4 +12,7 @@ export const ENV = {
   devAdminName: process.env.DEV_ADMIN_NAME ?? "Admin User",
   ollamaBaseUrl: process.env.OLLAMA_BASE_URL ?? "http://localhost:11434",
   ollamaModel: process.env.OLLAMA_MODEL ?? "mistral",
+  authDisabled:
+    process.env.DISABLE_AUTH === "true" ||
+    process.env.VITE_DISABLE_AUTH === "true",
 };
