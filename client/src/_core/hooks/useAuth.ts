@@ -11,6 +11,30 @@ type UseAuthOptions = {
 export function useAuth(options?: UseAuthOptions) {
   const { redirectOnUnauthenticated = false, redirectPath = getLoginUrl() } =
     options ?? {};
+
+  const AUTH_DISABLED = import.meta.env.VITE_DISABLE_AUTH === "true";
+
+  if (AUTH_DISABLED) {
+    const fakeUser = useMemo(
+      () => ({
+        openId: "auth-disabled",
+        name: "Admin",
+        email: "admin@localhost",
+        role: "admin" as const,
+      }),
+      []
+    );
+
+    return {
+      user: fakeUser,
+      loading: false,
+      error: null,
+      isAuthenticated: true,
+      refresh: () => Promise.resolve(),
+      logout: () => Promise.resolve(),
+    };
+  }
+
   const utils = trpc.useUtils();
 
   const meQuery = trpc.auth.me.useQuery(undefined, {
