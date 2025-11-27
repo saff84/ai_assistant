@@ -106,24 +106,10 @@ services:
       NODE_ENV: production
       PORT: 3000
       
-      # Auth
-      DISABLE_AUTH: "true"
-
-      # Login credentials (username/password)
-      DEV_MODE: ${DEV_MODE:-true}
-      DEV_ADMIN_EMAIL: ${DEV_ADMIN_EMAIL:-admin@admin.local}
-      DEV_ADMIN_NAME: ${DEV_ADMIN_NAME:-Admin User}
-      
       # Default admin credentials (created automatically at first startup)
       ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@admin.local}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin123}
       ADMIN_NAME: ${ADMIN_NAME:-Administrator}
-      
-      # OAuth (if using Manus)
-      OAUTH_SERVER_URL: ${OAUTH_SERVER_URL}
-      VITE_OAUTH_PORTAL_URL: ${VITE_OAUTH_PORTAL_URL}
-      VITE_APP_ID: ${VITE_APP_ID}
-      JWT_SECRET: ${JWT_SECRET:-your-secret-key-change-in-production}
       
       # Bitrix24 (optional)
       BITRIX24_WEBHOOK_URL: ${BITRIX24_WEBHOOK_URL}

@@ -4,7 +4,6 @@ import * as path from "path";
 import * as fs from "fs";
 import * as documentDb from "./documentDb";
 import * as documentProcessor from "./documentProcessor";
-import { sdk } from "./_core/sdk";
 import type { InsertDocumentChunk, InsertSection, InsertProduct } from "../drizzle/schema";
 import { getRagConfig } from "./rag/config";
 import { createStopwordSet, tokenize } from "./rag/textProcessing";
@@ -129,11 +128,6 @@ export function registerUploadRoutes(app: Express) {
   // Get document file endpoint
   app.get("/api/documents/:id/file", async (req: Request, res: Response) => {
     try {
-      // Authenticate user
-      const user = await sdk.authenticateRequest(req);
-      if (!user || user.role !== "admin") {
-        return res.status(403).json({ error: "Forbidden" });
-      }
 
       const documentId = parseInt(req.params.id, 10);
       if (isNaN(documentId)) {
@@ -246,18 +240,6 @@ export function registerUploadRoutes(app: Express) {
   // Upload document endpoint
   app.post("/api/upload/document", upload.single("file"), async (req: Request, res: Response) => {
     try {
-      // Authenticate user
-      const user = await sdk.authenticateRequest(req);
-      if (!user) {
-        res.status(401).json({ error: "Unauthorized" });
-        return;
-      }
-
-      // Only admins can upload documents
-      if (user.role !== "admin") {
-        res.status(403).json({ error: "Only administrators can upload documents" });
-        return;
-      }
 
       if (!req.file) {
         res.status(400).json({ error: "No file uploaded" });
@@ -294,7 +276,7 @@ export function registerUploadRoutes(app: Express) {
         filename,
         fileType,
         fileSize,
-        uploadedBy: user.id,
+        uploadedBy: 0,
         status: "processing",
         chunksCount: 0,
         processingType,

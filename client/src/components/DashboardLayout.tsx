@@ -19,14 +19,11 @@ import {
   SidebarTrigger,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { APP_LOGO, APP_TITLE, getLoginUrl } from "@/const";
+import { APP_LOGO, APP_TITLE } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
 import { LayoutDashboard, LogOut, PanelLeft, FileText, Settings, MessageSquare, BarChart3, Users } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
-import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
-import { Button } from "./ui/button";
-import { trpc } from "@/lib/trpc";
 
 const menuItems = [
   { icon: LayoutDashboard, label: "Dashboard", path: "/" },
@@ -42,100 +39,6 @@ const DEFAULT_WIDTH = 280;
 const MIN_WIDTH = 200;
 const MAX_WIDTH = 480;
 
-function LoginScreen() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-
-  const loginMutation = trpc.auth.login.useMutation({
-    onSuccess: () => {
-      window.location.reload();
-    },
-    onError: (err) => {
-      setError(err.message);
-    },
-  });
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-    loginMutation.mutate({ email: email.trim(), password });
-  };
-
-  return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-background to-muted/20">
-      <div className="flex flex-col items-center gap-8 p-8 max-w-md w-full">
-        <div className="flex flex-col items-center gap-6">
-          <div className="relative group">
-            <div className="relative">
-              <img
-                src={APP_LOGO}
-                alt={APP_TITLE}
-                className="h-20 w-20 rounded-xl object-cover shadow-lg"
-              />
-            </div>
-          </div>
-          <div className="text-center space-y-2">
-            <h1 className="text-3xl font-bold tracking-tight">{APP_TITLE}</h1>
-            <p className="text-sm text-muted-foreground">
-              Войдите в систему
-            </p>
-          </div>
-        </div>
-        
-        <form onSubmit={handleSubmit} className="w-full space-y-4">
-          <div className="space-y-2">
-            <label htmlFor="email" className="text-sm font-medium">
-              Email
-            </label>
-            <input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-              placeholder="admin@admin.local"
-              required
-              autoComplete="email"
-            />
-          </div>
-          
-          <div className="space-y-2">
-            <label htmlFor="password" className="text-sm font-medium">
-              Пароль
-            </label>
-            <input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-              placeholder="Введите пароль"
-              required
-              autoComplete="current-password"
-            />
-          </div>
-
-          {error && (
-            <div className="text-sm text-destructive text-center bg-destructive/10 p-3 rounded-lg">
-              {error}
-            </div>
-          )}
-
-          <Button
-            type="submit"
-            disabled={loginMutation.isPending}
-            size="lg"
-            className="w-full shadow-lg hover:shadow-xl transition-all"
-          >
-            {loginMutation.isPending ? "Вход..." : "Войти"}
-          </Button>
-        </form>
-      </div>
-    </div>
-  );
-}
-
 export default function DashboardLayout({
   children,
 }: {
@@ -145,19 +48,11 @@ export default function DashboardLayout({
     const saved = localStorage.getItem(SIDEBAR_WIDTH_KEY);
     return saved ? parseInt(saved, 10) : DEFAULT_WIDTH;
   });
-  const { loading, user } = useAuth();
+  const { user } = useAuth();
 
   useEffect(() => {
     localStorage.setItem(SIDEBAR_WIDTH_KEY, sidebarWidth.toString());
   }, [sidebarWidth]);
-
-  if (loading) {
-    return <DashboardLayoutSkeleton />
-  }
-
-  if (!user) {
-    return <LoginScreen />;
-  }
 
   return (
     <SidebarProvider
@@ -183,7 +78,7 @@ function DashboardLayoutContent({
   children,
   setSidebarWidth,
 }: DashboardLayoutContentProps) {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const [location, setLocation] = useLocation();
   const { state, toggleSidebar } = useSidebar();
   const isCollapsed = state === "collapsed";
@@ -319,11 +214,11 @@ function DashboardLayoutContent({
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
                 <DropdownMenuItem
-                  onClick={logout}
-                  className="cursor-pointer text-destructive focus:text-destructive"
+                  onClick={() => window.location.reload()}
+                  className="cursor-pointer"
                 >
                   <LogOut className="mr-2 h-4 w-4" />
-                  <span>Sign out</span>
+                  <span>Reload App</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
